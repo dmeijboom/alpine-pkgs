@@ -1,0 +1,47 @@
+# Contributor: Dillen Meijboom <info@excol.nl>
+# Maintainer:
+pkgname=zsh-full
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="Full featured version of ZSH shell"
+url="https://zsh-full.atom"
+arch="all"
+license="bsd3"
+depends="zsh"
+makedepends=""
+install=""
+maintainer="Dillen Meijboom <info@excol.nl>"
+subpackages=""
+source="
+  zsh-syntax-highlighting-0.7.1.tar.gz::https://github.com/zsh-users/zsh-syntax-highlighting/archive/0.7.1.tar.gz
+  zsh-autosuggestions-0.6.4.tar.gz::https://github.com/zsh-users/zsh-autosuggestions/archive/v0.6.4.tar.gz
+  https://github.com/starship/starship/releases/download/v0.47.0/starship-x86_64-unknown-linux-musl.tar.gz
+"
+builddir="$srcdir"
+
+_destdir=""
+
+build() {
+  # Replace with proper build command(s)
+  :
+}
+
+check() {
+  # Replace with proper check command(s)
+  :
+}
+
+package() {
+  local destdir="$pkgdir/usr/share/zsh-plugins"
+
+  install -D "$builddir/zsh-syntax-highlighting-0.7.1/.version" "$destdir/syntax-highlighting/.version"
+  install -D "$builddir/zsh-syntax-highlighting-0.7.1/.revision-hash" "$destdir/syntax-highlighting/.revision-hash"
+  install -D "$builddir/zsh-syntax-highlighting-0.7.1/zsh-syntax-highlighting.zsh" "$destdir/syntax-highlighting/plugin.zsh"
+  cp -r "$builddir/zsh-syntax-highlighting-0.7.1/highlighters" "$destdir/syntax-highlighting/highlighters"
+  install -D "$builddir/zsh-autosuggestions-0.6.4/zsh-autosuggestions.zsh" "$destdir/autosuggestions.zsh"
+  install -D -m0755 "$builddir/starship" "$pkgdir/bin/starship"
+}
+
+sha512sums="e7e86b88cdac9b9ed5f973823ba8efff99dd720b9ed929f765f9f9266b9d6e147274f5957ceb630d51a660e396fc22e97f10cfbc5cdde941b907f3773bb1ea2b  zsh-syntax-highlighting-0.7.1.tar.gz
+226b99048577ecdbe198501e6e4b3156c3d849994f0a2f7e15687cd244d4cac472cbcf746aaa32b2886652f6962852a475777b5f2bfcb3a6d0279be98a6020bb  zsh-autosuggestions-0.6.4.tar.gz
+631d27e0949d74c1d72e0bb83b312ed29522c14fa6c21dbb46cd0baa2f8e19b748a2acfbb00cfdf4ba6ba9791680e5c3601a50b1db2fdcd8252714ae20030fdc  starship-x86_64-unknown-linux-musl.tar.gz"
