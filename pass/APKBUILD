@@ -1,0 +1,49 @@
+# Contributor: Dillen Meijboom <info@excol.nl>
+# Maintainer:
+pkgname=pass
+pkgver=1.7.3
+pkgrel=0
+pkgdesc="The standard unix password manager"
+url="https://www.passwordstore.org/"
+arch="noarch"
+license="gplv2+"
+depends=""
+makedepends=""
+install=""
+maintainer="Dillen Meijboom <info@excol.nl>"
+subpackages="$pkgname-doc"
+source="
+  https://git.zx2c4.com/password-store/snapshot/password-store-${pkgver}.tar.xz
+  zsh.patch
+"
+builddir="$srcdir/password-store-${pkgver}"
+
+prepare() {
+  default_prepare
+}
+
+build() {
+  export PREFIX="$builddir/build"
+
+  cd "$builddir" && \
+    make install
+}
+
+check() {
+  # Replace with proper check command(s)
+  :
+}
+
+package() {
+  mkdir -p "$pkgdir/usr"
+  mv "$builddir/build/bin" "$pkgdir/usr/bin"
+  mv "$builddir/build/lib" "$pkgdir/usr/lib"
+  mv "$builddir/build/share" "$pkgdir/usr/share"
+}
+
+doc() {
+  default_doc
+}
+
+sha512sums="89755a7b02f05d75055a9fc14fd3f456c0a49ec31bdffd097a027f91228c64a98b18c1e80017aeda811773ae3287ff1b9737532da8ded06799d8fe3979ca06f7  password-store-1.7.3.tar.xz
+9c1b7222f5a1da373d03e55bdbf14c4e60d1d944680ce80d34038b4f3b6df029cb044e2c313f9027555834d86c1415c14be4cf2da70d293ec3da86d281254fad  zsh.patch"
