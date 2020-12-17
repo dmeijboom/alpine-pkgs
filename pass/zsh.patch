@@ -3,6 +3,216 @@
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env bash
 +#!/usr/bin/env zsh
-
+ 
  # Copyright (C) 2012 - 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  # This file is licensed under the GPLv2+. Please see COPYING for more information.
+@@ -136,9 +136,9 @@
+ 	done < <(find "$1" -path '*/.git' -prune -o -iname '*.gpg' -print0)
+ }
+ check_sneaky_paths() {
+-	local path
+-	for path in "$@"; do
+-		[[ $path =~ /\.\.$ || $path =~ ^\.\./ || $path =~ /\.\./ || $path =~ ^\.\.$ ]] && die "Error: You've attempted to pass a sneaky path to pass. Go home."
++	local ppath
++	for ppath in "$@"; do
++		[[ $ppath =~ /\.\.$ || $ppath =~ ^\.\./ || $ppath =~ /\.\./ || $ppath =~ ^\.\.$ ]] && die "Error: You've attempted to pass a sneaky path to pass. Go home."
+ 	done
+ }
+ 
+@@ -359,9 +359,9 @@
+ 	[[ $err -ne 0 || ( $qrcode -eq 1 && $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [pass-name]"
+ 
+ 	local pass
+-	local path="$1"
+-	local passfile="$PREFIX/$path.gpg"
+-	check_sneaky_paths "$path"
++	local ppath="$1"
++	local passfile="$PREFIX/$ppath.gpg"
++	check_sneaky_paths "$ppath"
+ 	if [[ -f $passfile ]]; then
+ 		if [[ $clip -eq 0 && $qrcode -eq 0 ]]; then
+ 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | $BASE64)" || exit $?
+@@ -371,22 +371,22 @@
+ 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | tail -n +${selected_line} | head -n 1)" || exit $?
+ 			[[ -n $pass ]] || die "There is no password to put on the clipboard at line ${selected_line}."
+ 			if [[ $clip -eq 1 ]]; then
+-				clip "$pass" "$path"
++				clip "$pass" "$ppath"
+ 			elif [[ $qrcode -eq 1 ]]; then
+-				qrcode "$pass" "$path"
++				qrcode "$pass" "$ppath"
+ 			fi
+ 		fi
+-	elif [[ -d $PREFIX/$path ]]; then
+-		if [[ -z $path ]]; then
++	elif [[ -d $PREFIX/$ppath ]]; then
++		if [[ -z $ppath ]]; then
+ 			echo "Password Store"
+ 		else
+-			echo "${path%\/}"
++			echo "${ppath%\/}"
+ 		fi
+-		tree -C -l --noreport "$PREFIX/$path" | tail -n +2 | sed -E 's/\.gpg(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .gpg at end of line, but keep colors
+-	elif [[ -z $path ]]; then
++		tree -C -l --noreport "$PREFIX/$ppath" | tail -n +2 | sed -E 's/\.gpg(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .gpg at end of line, but keep colors
++	elif [[ -z $ppath ]]; then
+ 		die "Error: password store is empty. Try \"pass init\"."
+ 	else
+-		die "Error: $path is not in the password store."
++		die "Error: $ppath is not in the password store."
+ 	fi
+ }
+ 
+@@ -426,26 +426,26 @@
+ 	esac done
+ 
+ 	[[ $err -ne 0 || ( $multiline -eq 1 && $noecho -eq 0 ) || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--echo,-e | --multiline,-m] [--force,-f] pass-name"
+-	local path="${1%/}"
+-	local passfile="$PREFIX/$path.gpg"
+-	check_sneaky_paths "$path"
++	local ppath="${1%/}"
++	local passfile="$PREFIX/$ppath.gpg"
++	check_sneaky_paths "$ppath"
+ 	set_git "$passfile"
+ 
+-	[[ $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $path. Overwrite it?"
++	[[ $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $ppath. Overwrite it?"
+ 
+-	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
+-	set_gpg_recipients "$(dirname -- "$path")"
++	mkdir -p -v "$PREFIX/$(dirname -- "$ppath")"
++	set_gpg_recipients "$(dirname -- "$ppath")"
+ 
+ 	if [[ $multiline -eq 1 ]]; then
+-		echo "Enter contents of $path and press Ctrl+D when finished:"
++		echo "Enter contents of $ppath and press Ctrl+D when finished:"
+ 		echo
+ 		$GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+ 	elif [[ $noecho -eq 1 ]]; then
+ 		local password password_again
+ 		while true; do
+-			read -r -p "Enter password for $path: " -s password || exit 1
++			read -r -p "Enter password for $ppath: " -s password || exit 1
+ 			echo
+-			read -r -p "Retype password for $path: " -s password_again || exit 1
++			read -r -p "Retype password for $ppath: " -s password_again || exit 1
+ 			echo
+ 			if [[ $password == "$password_again" ]]; then
+ 				echo "$password" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+@@ -456,24 +456,24 @@
+ 		done
+ 	else
+ 		local password
+-		read -r -p "Enter password for $path: " -e password
++		read -r -p "Enter password for $ppath: " -e password
+ 		echo "$password" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+ 	fi
+-	git_add_file "$passfile" "Add given password for $path to store."
++	git_add_file "$passfile" "Add given password for $ppath to store."
+ }
+ 
+ cmd_edit() {
+ 	[[ $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND pass-name"
+ 
+-	local path="${1%/}"
+-	check_sneaky_paths "$path"
+-	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
+-	set_gpg_recipients "$(dirname -- "$path")"
+-	local passfile="$PREFIX/$path.gpg"
++	local ppath="${1%/}"
++	check_sneaky_paths "$ppath"
++	mkdir -p -v "$PREFIX/$(dirname -- "$ppath")"
++	set_gpg_recipients "$(dirname -- "$ppath")"
++	local passfile="$PREFIX/$ppath.gpg"
+ 	set_git "$passfile"
+ 
+ 	tmpdir #Defines $SECURE_TMPDIR
+-	local tmp_file="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}.txt"
++	local tmp_file="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${ppath//\//-}.txt"
+ 
+ 	local action="Add"
+ 	if [[ -f $passfile ]]; then
+@@ -486,7 +486,7 @@
+ 	while ! $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" "$tmp_file"; do
+ 		yesno "GPG encryption failed. Would you like to try again?"
+ 	done
+-	git_add_file "$passfile" "$action password for $path using ${EDITOR:-vi}."
++	git_add_file "$passfile" "$action password for $ppath using ${EDITOR:-vi}."
+ }
+ 
+ cmd_generate() {
+@@ -504,17 +504,17 @@
+ 	esac done
+ 
+ 	[[ $err -ne 0 || ( $# -ne 2 && $# -ne 1 ) || ( $force -eq 1 && $inplace -eq 1 ) || ( $qrcode -eq 1 && $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--no-symbols,-n] [--clip,-c] [--qrcode,-q] [--in-place,-i | --force,-f] pass-name [pass-length]"
+-	local path="$1"
++	local ppath="$1"
+ 	local length="${2:-$GENERATED_LENGTH}"
+-	check_sneaky_paths "$path"
++	check_sneaky_paths "$ppath"
+ 	[[ $length =~ ^[0-9]+$ ]] || die "Error: pass-length \"$length\" must be a number."
+ 	[[ $length -gt 0 ]] || die "Error: pass-length must be greater than zero."
+-	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
+-	set_gpg_recipients "$(dirname -- "$path")"
+-	local passfile="$PREFIX/$path.gpg"
++	mkdir -p -v "$PREFIX/$(dirname -- "$ppath")"
++	set_gpg_recipients "$(dirname -- "$ppath")"
++	local passfile="$PREFIX/$ppath.gpg"
+ 	set_git "$passfile"
+ 
+-	[[ $inplace -eq 0 && $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $path. Overwrite it?"
++	[[ $inplace -eq 0 && $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $ppath. Overwrite it?"
+ 
+ 	read -r -n $length pass < <(LC_ALL=C tr -dc "$characters" < /dev/urandom)
+ 	[[ ${#pass} -eq $length ]] || die "Could not generate password from /dev/urandom."
+@@ -531,14 +531,14 @@
+ 	fi
+ 	local verb="Add"
+ 	[[ $inplace -eq 1 ]] && verb="Replace"
+-	git_add_file "$passfile" "$verb generated password for ${path}."
++	git_add_file "$passfile" "$verb generated password for ${ppath}."
+ 
+ 	if [[ $clip -eq 1 ]]; then
+-		clip "$pass" "$path"
++		clip "$pass" "$ppath"
+ 	elif [[ $qrcode -eq 1 ]]; then
+-		qrcode "$pass" "$path"
++		qrcode "$pass" "$ppath"
+ 	else
+-		printf "\e[1mThe generated password for \e[4m%s\e[24m is:\e[0m\n\e[1m\e[93m%s\e[0m\n" "$path" "$pass"
++		printf "\e[1mThe generated password for \e[4m%s\e[24m is:\e[0m\n\e[1m\e[93m%s\e[0m\n" "$ppath" "$pass"
+ 	fi
+ }
+ 
+@@ -553,23 +553,23 @@
+ 		--) shift; break ;;
+ 	esac done
+ 	[[ $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--recursive,-r] [--force,-f] pass-name"
+-	local path="$1"
+-	check_sneaky_paths "$path"
++	local ppath="$1"
++	check_sneaky_paths "$ppath"
+ 
+-	local passdir="$PREFIX/${path%/}"
+-	local passfile="$PREFIX/$path.gpg"
+-	[[ -f $passfile && -d $passdir && $path == */ || ! -f $passfile ]] && passfile="${passdir%/}/"
+-	[[ -e $passfile ]] || die "Error: $path is not in the password store."
++	local passdir="$PREFIX/${ppath%/}"
++	local passfile="$PREFIX/$ppath.gpg"
++	[[ -f $passfile && -d $passdir && $ppath == */ || ! -f $passfile ]] && passfile="${passdir%/}/"
++	[[ -e $passfile ]] || die "Error: $ppath is not in the password store."
+ 	set_git "$passfile"
+ 
+-	[[ $force -eq 1 ]] || yesno "Are you sure you would like to delete $path?"
++	[[ $force -eq 1 ]] || yesno "Are you sure you would like to delete $ppath?"
+ 
+ 	rm $recursive -f -v "$passfile"
+ 	set_git "$passfile"
+ 	if [[ -n $INNER_GIT_DIR && ! -e $passfile ]]; then
+ 		git -C "$INNER_GIT_DIR" rm -qr "$passfile"
+ 		set_git "$passfile"
+-		git_commit "Remove $path from store."
++		git_commit "Remove $ppath from store."
+ 	fi
+ 	rmdir -p "${passfile%/*}" 2>/dev/null
+ }
