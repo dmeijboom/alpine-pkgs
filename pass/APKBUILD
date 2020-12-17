@@ -7,14 +7,16 @@ pkgdesc="The standard unix password manager"
 url="https://www.passwordstore.org/"
 arch="noarch"
 license="gplv2+"
-depends="tree"
+depends="
+  tree
+  bash
+"
 makedepends=""
 install=""
 maintainer="Dillen Meijboom <info@excol.nl>"
 subpackages="$pkgname-doc"
 source="
   https://git.zx2c4.com/password-store/snapshot/password-store-${pkgver}.tar.xz
-  zsh.patch
 "
 builddir="$srcdir/password-store-${pkgver}"
 
@@ -45,5 +47,4 @@ doc() {
   default_doc
 }
 
-sha512sums="89755a7b02f05d75055a9fc14fd3f456c0a49ec31bdffd097a027f91228c64a98b18c1e80017aeda811773ae3287ff1b9737532da8ded06799d8fe3979ca06f7  password-store-1.7.3.tar.xz
-f80301c1ca98e50a3f28e55b27213de2fa48de2c37a2ac437255c100eae243e25ba02c54b234700afd1cd5e837226b65cdd69ae9b70e8b34f501f70c624d1a04  zsh.patch"
+sha512sums="89755a7b02f05d75055a9fc14fd3f456c0a49ec31bdffd097a027f91228c64a98b18c1e80017aeda811773ae3287ff1b9737532da8ded06799d8fe3979ca06f7  password-store-1.7.3.tar.xz"
