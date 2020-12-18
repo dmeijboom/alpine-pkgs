@@ -1,0 +1,31 @@
+# Contributor: Dillen Meijboom <info@excol.nl>
+# Maintainer:
+pkgname=starship
+pkgver=0.47.0
+pkgrel=0
+pkgdesc="The minimal, blazing-fast, and infinitely customizable prompt for any shell!"
+url="https://github.com/starship/starship"
+arch="x86_64"
+license="ics"
+depends="zsh"
+makedepends=""
+install=""
+maintainer="Dillen Meijboom <info@excol.nl>"
+subpackages=""
+source="https://github.com/starship/starship/releases/download/v${pkgver}/starship-x86_64-unknown-linux-musl.tar.gz"
+
+build() {
+  # Replace with proper build command(s)
+  :
+}
+
+check() {
+  # Replace with proper check command(s)
+  :
+}
+
+package() {
+  install -D -m0755 "$srcdir/starship" "$pkgdir/bin/starship"
+}
+
+sha512sums="631d27e0949d74c1d72e0bb83b312ed29522c14fa6c21dbb46cd0baa2f8e19b748a2acfbb00cfdf4ba6ba9791680e5c3601a50b1db2fdcd8252714ae20030fdc  starship-x86_64-unknown-linux-musl.tar.gz"

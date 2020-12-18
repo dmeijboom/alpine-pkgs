@@ -1,0 +1,37 @@
+# Contributor: Dillen Meijboom <info@excol.nl>
+# Maintainer:
+pkgname=zsh-syntax-highlighting
+pkgver=0.7.1
+pkgrel=0
+pkgdesc="Full featured version of ZSH shell"
+url="https://github.com/zsh-users/zsh-syntax-highlighting"
+arch="noarch"
+license="bsd3"
+depends="zsh"
+makedepends=""
+install=""
+maintainer="Dillen Meijboom <info@excol.nl>"
+subpackages=""
+source="zsh-syntax-highlighting-0.7.1.tar.gz::https://github.com/zsh-users/zsh-syntax-highlighting/archive/0.7.1.tar.gz"
+builddir="$srcdir/zsh-syntax-highlighting-${pkgver}"
+
+build() {
+  # Replace with proper build command(s)
+  :
+}
+
+check() {
+  # Replace with proper check command(s)
+  :
+}
+
+package() {
+  local destdir="$pkgdir/usr/share/zsh-plugins/syntax-highlighting"
+
+  install -D "$builddir/.version" "$destdir/.version"
+  install -D "$builddir/.revision-hash" "$destdir/.revision-hash"
+  install -D "$builddir/zsh-syntax-highlighting.zsh" "$destdir/plugin.zsh"
+  cp -r "$builddir/highlighters" "$destdir/highlighters"
+}
+
+sha512sums="e7e86b88cdac9b9ed5f973823ba8efff99dd720b9ed929f765f9f9266b9d6e147274f5957ceb630d51a660e396fc22e97f10cfbc5cdde941b907f3773bb1ea2b  zsh-syntax-highlighting-0.7.1.tar.gz"
