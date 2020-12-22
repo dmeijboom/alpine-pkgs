@@ -1,0 +1,79 @@
+# Contributor: Dillen Meijboom <info@excol.nl>
+# Maintainer:
+pkgname=neovim
+pkgver=0.5.0
+pkgrel=0
+pkgdesc="Vim-fork focused on extensibility and usability"
+url="https://github.com/neovim/neovim"
+arch="x86_64"
+license="apache2"
+depends="
+  luajit
+  libluv
+  msgpack-c
+  libtermkey
+  unibilium
+  libuv
+  libintl
+  libvterm
+  tree-sitter
+"
+makedepends="
+  cmake
+  unzip
+  samurai
+  autoconf
+  automake
+  gettext
+  libtool
+  libuv-dev
+  libluv-dev
+  musl-libintl
+  msgpack-c-dev
+  tree-sitter
+  luajit-dev
+  unibilium-dev
+  libtermkey-dev
+  libvterm-dev
+  lua5.1
+  lua5.1-lpeg
+  lua5.1-mpack
+  gperf
+"
+install=""
+maintainer="Dillen Meijboom <info@excol.nl>"
+subpackages="$pkgname-doc"
+source="neovim-${pkgver}.tar.gz::https://github.com/neovim/neovim/archive/nightly.tar.gz"
+builddir="$srcdir/neovim-nightly"
+
+build() {
+  mkdir -p "$builddir/build"
+  cd "$builddir/build"
+
+  cmake .. -DCMAKE_BUILD_TYPE=None \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_VERBOSE_MAKEFILE=TRUE \
+    $cmakeoptions
+
+  make
+}
+
+check() {
+  :
+}
+
+package() {
+  cd "$builddir/build"
+
+  make DESTDIR="$pkgdir" install
+
+  install -Dm644 "$builddir/runtime/nvim.desktop" "$pkgdir/usr/share/applications/nvim.desktop"
+  install -Dm644 "$builddir/runtime/nvim.png" "$pkgdir/usr/share/pixmaps/nvim.png"
+}
+
+doc() {
+  default_doc
+}
+
+sha512sums="18fcedccbe66e7bb184eada660d31374949f5b9d0812b0c79b04ef96d2493d25aca694e2856ce9d9604cf4f3722e1d573f543b733b362468e62c2b71a7db1fa2  neovim-0.5.0.tar.gz"
