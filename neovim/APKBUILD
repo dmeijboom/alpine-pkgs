@@ -50,7 +50,8 @@ build() {
   mkdir -p "$builddir/build"
   cd "$builddir/build"
 
-  cmake .. -DCMAKE_BUILD_TYPE=None \
+  cmake .. \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_VERBOSE_MAKEFILE=TRUE \
