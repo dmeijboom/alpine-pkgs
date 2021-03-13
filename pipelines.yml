@@ -1,0 +1,29 @@
+resources:
+  - name: alpinePkgs
+    type: GitRepo
+    configuration:
+      gitProvider: Github
+      path: dmeijboom/alpine-pkgs
+      branches:
+        include: master
+
+pipelines:
+  - name: packages
+    steps:
+      - name: treeSitter
+        type: Bash
+        configuration:
+          runtime:
+            type: image
+            image:
+              custom:
+                name: alpine
+                tag: 3.12.4
+          inputResources:
+            - name: alpinePkgs
+        execution:
+          onStart:
+            - apk add alpine-sdk
+          onExecute:
+            - cd $res_alpinePkgs_resourcePath/tree-sitter
+            - abuild -r
