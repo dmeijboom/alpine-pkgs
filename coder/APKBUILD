@@ -1,0 +1,40 @@
+# Contributor: Dillen Meijboom <info@excol.nl>
+# Maintainer:
+pkgname=coder
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="Coder"
+url="https://gitlab.com/excol/oss/coder"
+arch="x86_64"
+license="mit"
+depends="
+"
+makedepends="
+  rust
+  cargo
+"
+install=""
+maintainer="Dillen Meijboom <info@excol.nl>"
+source="https://gitlab.com/excol/oss/coder/-/archive/master/coder-master.tar.gz"
+builddir="$srcdir/coder-master"
+
+build() {
+  mkdir -p "$builddir/bin"
+  cd "$builddir/src"
+
+  cargo build --release && \
+    mv ../target/release/coder "$builddir/bin/coder"
+}
+
+check() {
+  :
+}
+
+package() {
+  install -Dm755 "$builddir/bin/coder" "$pkgdir/usr/bin/coder"
+}
+
+doc() {
+  default_doc
+}
+sha512sums="907dc7076bba13a89f78921477f2df001539ad7f0c422ab4fd368e570972061037de31dff64386f1c5bed573e85126d5bff3ac6ce75608e416d265cdd03e5df2  coder-master.tar.gz"
