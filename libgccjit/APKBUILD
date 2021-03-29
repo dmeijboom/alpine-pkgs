@@ -1,0 +1,39 @@
+# Contributor: Dillen Meijboom <info@excol.nl>
+# Maintainer:
+pkgname=libgccjit
+pkgver=0.0.3
+pkgrel=0
+pkgdesc="GNU C Compiler JIT Runtime library"
+url="https://libgccjit.io"
+arch="x86_64"
+license="mit"
+depends=""
+makedepends=""
+install=""
+maintainer="Dillen Meijboom <info@excol.nl>"
+subpackages=""
+source="libgccjit.so libgccjit.so.0 libgccjit.so.0.0.1 libgccjit.h libgccjit++.h"
+
+build() {
+  # Replace with proper build command(s)
+  :
+}
+
+check() {
+  # Replace with proper check command(s)
+  :
+}
+
+package() {
+  install -D -m0755 "$srcdir/libgccjit.so" "$pkgdir/lib/libgccjit.so"
+  install -D -m0755 "$srcdir/libgccjit.so.0" "$pkgdir/lib/libgccjit.so.0"
+  install -D -m0755 "$srcdir/libgccjit.so.0.0.1" "$pkgdir/lib/libgccjit.so.0.0.1"
+  install -D -m0755 "$srcdir/libgccjit.h" "$pkgdir/usr/include/libgccjit.h"
+  install -D -m0755 "$srcdir/libgccjit++.h" "$pkgdir/usr/include/libgccjit++.h"
+}
+
+sha512sums="0be585a3876a3b639849d47c09d12f200f9b27255a30f91b800cb5bae0d9cd0ecee500afe2a2df767cd2911763a016516b36df36f086b007b529a4244be1c399  libgccjit.so
+0be585a3876a3b639849d47c09d12f200f9b27255a30f91b800cb5bae0d9cd0ecee500afe2a2df767cd2911763a016516b36df36f086b007b529a4244be1c399  libgccjit.so.0
+0be585a3876a3b639849d47c09d12f200f9b27255a30f91b800cb5bae0d9cd0ecee500afe2a2df767cd2911763a016516b36df36f086b007b529a4244be1c399  libgccjit.so.0.0.1
+7ea6408cb5229fdc4bc9952ca3b8918a918314ecfe36dc830f62f3111048eec92490c3980a80566c22d00a26a92c9789ba448bdcc614d2b1bc2ce9c290dd4b10  libgccjit.h
+67cbe4260c5f76b613b12a058e7b7a3bfd7f7241695aa8001bcf95e9b56efa82355d19d421534d4070805705409ab37203de17a4d503e9f10e8057e85a31cf04  libgccjit++.h"
